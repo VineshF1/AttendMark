@@ -22,12 +22,13 @@ import {
 
 // ── Replace with your Firebase project config ─────────────────────────────────
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_AUTH_DOMAIN",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_STORAGE_BUCKET",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId: "YOUR_APP_ID",
+  apiKey: "AIzaSyAv72mq3PRxCO-LWVVT9R0arzArgv5wQNk",
+  authDomain: "attendmark-17229.firebaseapp.com",
+  projectId: "attendmark-17229",
+  storageBucket: "attendmark-17229.firebasestorage.app",
+  messagingSenderId: "547555767179",
+  appId: "1:547555767179:web:0eb7ff8144e64a545fb58e",
+  measurementId: "G-F0GGR7S6PW"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -132,8 +133,8 @@ function Dashboard() {
         ))}
       </nav>
       <main>
-        {tab === "mark"     && <MarkTab />}
-        {tab === "history"  && <HistoryTab />}
+        {tab === "mark" && <MarkTab />}
+        {tab === "history" && <HistoryTab />}
         {tab === "students" && <StudentsTab />}
       </main>
     </div>
@@ -142,7 +143,7 @@ function Dashboard() {
 
 // ── Mark Attendance ───────────────────────────────────────────────────────────
 function MarkTab() {
-  const [date, setDate]     = useState(today());
+  const [date, setDate] = useState(today());
   const [period, setPeriod] = useState("P-1");
   const [students, setStudents] = useState([]);
   const [absent, setAbsent] = useState(new Set());
@@ -259,9 +260,9 @@ function MarkTab() {
 
 // ── History ───────────────────────────────────────────────────────────────────
 function HistoryTab() {
-  const [records, setRecords]   = useState([]);
-  const [loading, setLoading]   = useState(true);
-  const [filterDate, setFilterDate]     = useState("");
+  const [records, setRecords] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [filterDate, setFilterDate] = useState("");
   const [filterPeriod, setFilterPeriod] = useState("");
   const [copied, setCopied] = useState("");
 
@@ -272,7 +273,7 @@ function HistoryTab() {
     let q = query(collection(db, "attendance"), orderBy("date", "desc"), orderBy("period"));
     const snap = await getDocs(q);
     let all = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    if (filterDate)   all = all.filter(r => r.date === filterDate);
+    if (filterDate) all = all.filter(r => r.date === filterDate);
     if (filterPeriod) all = all.filter(r => r.period === filterPeriod);
     setRecords(all);
     setLoading(false);
@@ -314,8 +315,8 @@ function HistoryTab() {
       {loading
         ? <p className="empty">Loading…</p>
         : !grouped.length
-        ? <p className="empty">No records found.</p>
-        : grouped.map(g => {
+          ? <p className="empty">No records found.</p>
+          : grouped.map(g => {
             const key = `${g.date}${g.period}`;
             const list = smartSort(g.nums).join(", ");
             return (
@@ -339,8 +340,8 @@ function HistoryTab() {
 // ── Students ──────────────────────────────────────────────────────────────────
 function StudentsTab() {
   const [students, setStudents] = useState([]);
-  const [input, setInput]       = useState("");
-  const [loading, setLoading]   = useState(true);
+  const [input, setInput] = useState("");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => { load(); }, []);
 
@@ -390,7 +391,7 @@ function StudentsTab() {
         </h2>
         {loading ? <p className="empty">Loading…</p>
           : !students.length ? <p className="empty">No students yet.</p>
-          : <div className="chip-grid">
+            : <div className="chip-grid">
               {students.map(num => (
                 <div key={num} className="chip">
                   <span>{num}</span>
