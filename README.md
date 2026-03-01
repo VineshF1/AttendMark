@@ -30,9 +30,8 @@ Just the teacher. Only you can log in — no one else has access.
 ## Tech used
 
 - **React** — frontend UI
-- **Supabase** — database + login
 - **Vite** — local development
-- **Vercel** — free hosting
+- **Firebase** — Deployment and hosting
 
 ---
 
