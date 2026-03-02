@@ -11,24 +11,22 @@ import {
   getFirestore,
   collection,
   getDocs,
-  addDoc,
   deleteDoc,
   doc,
   query,
-  where,
   orderBy,
   setDoc,
 } from "firebase/firestore";
 
 // ── Replace with your Firebase project config ─────────────────────────────────
 const firebaseConfig = {
-  apiKey: "XXXXXXXX",
-  authDomain: "attendmark-17229.firebaseapp.com",
-  projectId: "attendmark-17229",
-  storageBucket: "XXXXXXX",
-  messagingSenderId: "XXXXXXX",
-  appId: "XXXXXXXXXXX",
-  measurementId: "XXXXXXXXXX"
+  apiKey: "XXXXXXXXXXXXXXXXX",
+  authDomain: "XXXXXXXXXXXXXXXXX",
+  projectId: "XXXXXXXXXXXXXXXXX",
+  storageBucket: "XXXXXXXXXXXXXXXXX",
+  messagingSenderId: "XXXXXXXXXXXXXXXXX",
+  appId: "XXXXXXXXXXXXXXXXX",
+  measurementId: "XXXXXXXXXXXXXXXXX"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -174,30 +172,23 @@ function MarkTab() {
     if (!students.length) { alert("Add students first in the Students tab."); return; }
     setStatus("saving");
 
-    // Delete existing records for this date + period
-    const q = query(
-      collection(db, "attendance"),
-      where("date", "==", date),
-      where("period", "==", period)
-    );
-    const existing = await getDocs(q);
-    await Promise.all(existing.docs.map(d => deleteDoc(doc(db, "attendance", d.id))));
-
-    // Insert new absent records
-    if (absent.size > 0) {
-      await Promise.all([...absent].map(num =>
-        addDoc(collection(db, "attendance"), {
-          date,
-          period,
-          student_number: num,
-          created_at: new Date().toISOString(),
-        })
-      ));
+    // Store as one document per date+period — organized and clean
+    const docId = `${date}_${period}`;
+    const absentList = smartSort([...absent]);
+    try {
+      await setDoc(doc(db, "attendance", docId), {
+        date,
+        period,
+        absent: absentList,
+        created_at: new Date().toISOString(),
+      });
+      const list = absentList.join(", ");
+      setOutput(`${fmtDate(date)}    ${period}\n${list || "No absences"}`);
+      setStatus("saved");
+    } catch (e) {
+      alert("Save failed: " + e.message);
+      setStatus("idle");
     }
-
-    const list = smartSort([...absent]).join(", ");
-    setOutput(`${fmtDate(date)}    ${period}\n${list || "No absences"}`);
-    setStatus("saved");
   }
 
   async function copy() {
@@ -279,17 +270,9 @@ function HistoryTab() {
     setLoading(false);
   }
 
-  const grouped = Object.values(
-    records.reduce((acc, r) => {
-      const key = `${r.date}||${r.period}`;
-      if (!acc[key]) acc[key] = { date: r.date, period: r.period, nums: [] };
-      acc[key].nums.push(r.student_number);
-      return acc;
-    }, {})
-  );
-
+  // Each record now has an 'absent' array — no grouping needed
   async function copyEntry(g) {
-    const list = smartSort(g.nums).join(", ");
+    const list = smartSort(g.absent || []).join(", ");
     await navigator.clipboard.writeText(`${fmtDate(g.date)}    ${g.period}\n${list || "No absences"}`);
     setCopied(`${g.date}${g.period}`);
     setTimeout(() => setCopied(""), 2000);
@@ -314,11 +297,11 @@ function HistoryTab() {
 
       {loading
         ? <p className="empty">Loading…</p>
-        : !grouped.length
+        : !records.length
           ? <p className="empty">No records found.</p>
-          : grouped.map(g => {
+          : records.map(g => {
             const key = `${g.date}${g.period}`;
-            const list = smartSort(g.nums).join(", ");
+            const list = smartSort(g.absent || []).join(", ");
             return (
               <div key={key} className="card history-entry">
                 <div className="hist-top">
