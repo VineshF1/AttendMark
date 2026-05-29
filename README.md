@@ -35,7 +35,7 @@ Just the teacher. Only you can log in — no one else has access.
 
 ---
 
-## Student list
+## Student list used
 
 - Numbers **1 to 66** (excluding 11, 29, 63)
 - Plus **LE01 to LE06**
