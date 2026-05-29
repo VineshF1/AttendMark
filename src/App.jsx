@@ -248,7 +248,7 @@ function MarkTab() {
 
 // ── History ───────────────────────────────────────────────────────────────────
 function HistoryTab() {
-  const [record, setRecord]     = useState(null);   // single result
+  const [record, setRecord]     = useState(null);  
   const [loading, setLoading]   = useState(false);
   const [searched, setSearched] = useState(false);
   const [filterDate, setFilterDate]     = useState("");
